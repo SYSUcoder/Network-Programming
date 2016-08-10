@@ -4,6 +4,8 @@
 #include <arpa/inet.h> // inet_pton   inet(3) functions
 #include <unistd.h> // read()
 #include <errno.h> // errno
+#include <sys/wait.h> // waitpid()
+
 #include "readAndWrite.h"
 
 #include <stdio.h>
@@ -16,6 +18,7 @@
 #define SERV_PORT  9877
 #define SA struct sockaddr
 
+// echo to client
 void str_echo(int sockfd)
 {
 	ssize_t n;
@@ -43,6 +46,16 @@ void str_echo(int sockfd)
 	}
 }
 
+void sig_chld(int signo)
+{
+	pid_t pid;
+	int stat;
+
+	while ( (pid = waitpid(-1, &stat, WNOHANG)) > 0)
+		printf("child %d terminated\n", pid);
+	return;
+}
+
 int main(int argc, char **argv)
 {
 	int listenfd, connfd;
@@ -64,10 +77,22 @@ int main(int argc, char **argv)
 	// listen()
 	listen(listenfd, LISTENQ);
 
+	// call waitpid()
+	signal(SIGCHLD, sig_chld);
+
 	for ( ; ; )
 	{
 		clilen = sizeof(cliaddr);
-		connfd = accept(listenfd, (SA *) &cliaddr, &clilen);
+		if ( (connfd = accept(listenfd, (SA *) &cliaddr, &clilen)) < 0)
+		{
+			if (errno == EINTR)
+				continue;
+			else
+			{
+				printf("accept error\n");
+				exit(1);
+			}
+		}
 
 		if ( (childpid = fork()) == 0)
 		{
