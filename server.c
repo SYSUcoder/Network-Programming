@@ -1,7 +1,7 @@
 #include <sys/socket.h> // sockfd and basic socket definitions
 #include <sys/types.h> // basic socket definitions
-#include <netinet/in.h> // IPPROTO_TCP and etc   sockaddr_in() and other Internet defns
-#include <arpa/inet.h> // inet_pton   inet(3) functions
+#include <netinet/in.h> // IPPROTO_TCP and etc   sockaddr_in and other Internet defns
+#include <arpa/inet.h> // inet_pton   inet(3) functions htonl() & htons()
 #include <unistd.h> // read()
 #include <errno.h> // errno
 #include <sys/wait.h> // waitpid()

@@ -28,8 +28,8 @@ void str_cli(FILE *fp, int sockfd)
 		}
 
 		fputs(recvline, stdout);
-                memset(sendline, 0, sizeof(sendline));
-                memset(recvline, 0, sizeof(recvline));
+        memset(sendline, 0, sizeof(sendline));
+		memset(recvline, 0, sizeof(recvline));
 	}
 }
 
