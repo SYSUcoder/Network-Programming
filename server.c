@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 
 #define MAXLINE 4096
@@ -30,6 +31,33 @@ void str_echo(int sockfd)
 		{
 			writen(sockfd, buf, n);
 			printf("%s", buf);
+			memset(buf, 0, sizeof(buf));
+		}
+			
+
+		// if read() was interrupted and it will set errno as EINTR
+		if (n < 0 && errno == EINTR)
+			continue;
+		else if (n < 0)
+		{
+			printf("str_echo: read error");
+			exit(1);
+		}
+		break;
+	}
+}
+
+void showTextWithTime(int sockfd, struct sockaddr_in *cliaddr)
+{
+	ssize_t n;
+	char buf[MAXLINE];
+	time_t ticks;
+	while (1)
+	{
+		while ( (n = read(sockfd, buf, MAXLINE)) > 0)
+		{
+			ticks = time(NULL);
+			printf("(%.24s)\nFrom port %d: %s", ctime(&ticks), ntohs((*cliaddr).sin_port), buf);
 			memset(buf, 0, sizeof(buf));
 		}
 			
@@ -97,7 +125,8 @@ int main(int argc, char **argv)
 		if ( (childpid = fork()) == 0)
 		{
 			close(listenfd);
-			str_echo(connfd);
+			// str_echo(connfd);
+			showTextWithTime(connfd, &cliaddr);
 			exit(0);
 		}
 		close(connfd);

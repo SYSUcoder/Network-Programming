@@ -20,14 +20,14 @@ void str_cli(FILE *fp, int sockfd)
 	while (fgets(sendline, MAXLINE, fp) != NULL)
 	{
 		writen(sockfd, sendline, strlen(sendline));
-
+		/*
 		if (readline(sockfd, recvline, MAXLINE) == 0)
 		{
 			printf("str_cli: server terminated prematurely\n");
 			exit(1);
 		}
-
 		fputs(recvline, stdout);
+		*/
         memset(sendline, 0, sizeof(sendline));
 		memset(recvline, 0, sizeof(recvline));
 	}
